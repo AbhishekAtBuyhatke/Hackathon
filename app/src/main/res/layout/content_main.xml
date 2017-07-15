@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="lab.abhishek.apiaiimplementation.MainActivity"
+    android:gravity="center"
+    tools:showIn="@layout/activity_main">
+
+    <TextView
+        android:id="@+id/tv_resolved_query_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/resolved_query"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_resolved_query"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/tv_resolved_query_tag"/>
+
+    <TextView
+        android:id="@+id/tv_action_tag"
+        android:layout_below="@+id/tv_resolved_query_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/action"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_action"
+        android:layout_below="@+id/tv_resolved_query_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/tv_action_tag"/>
+
+    <TextView
+        android:id="@+id/tv_parameters_tag"
+        android:layout_below="@+id/tv_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/parameters"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_parameters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_action"
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/tv_parameters_tag"/>
+
+    <TextView
+        android:id="@+id/tv_contexts_tag"
+        android:layout_width="wrap_content"
+        android:layout_below="@+id/tv_parameters"
+        android:layout_height="wrap_content"
+        android:text="@string/contexts"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_context"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_parameters"
+        android:layout_marginBottom="5dp"
+        android:layout_toRightOf="@+id/tv_contexts_tag"/>
+
+    <TextView
+        android:id="@+id/tv_response_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_context"
+        android:text="@string/response"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tv_response"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_context"
+        android:layout_toRightOf="@+id/tv_response_tag"/>
+
+</RelativeLayout>
