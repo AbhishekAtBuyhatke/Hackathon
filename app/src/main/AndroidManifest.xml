@@ -22,7 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ActivityRecyclerView"></activity>
 
         <service
             android:name=".accessiblity.CustomAccessibilityService"
