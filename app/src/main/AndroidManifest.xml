@@ -39,6 +39,11 @@
                 android:resource="@xml/accessibilityservice"/>
         </service>
 
+        <activity android:name=".SearchItemActivity" />
+        <activity
+            android:name=".FlightActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".CouponsActivity"></activity>
     </application>
 
 </manifest>

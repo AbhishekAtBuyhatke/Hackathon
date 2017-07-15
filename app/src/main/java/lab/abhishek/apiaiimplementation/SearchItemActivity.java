@@ -1,6 +1,5 @@
 package lab.abhishek.apiaiimplementation;
 
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,16 +16,18 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import ai.api.services.GoogleRecognitionServiceImpl;
+import lab.abhishek.apiaiimplementation.Models.SearchResult;
 
 import static lab.abhishek.apiaiimplementation.MainActivity.SEARCH_QUERY;
+import static lab.abhishek.apiaiimplementation.MainActivity.SEARCH_SITE;
 
-public class ActivityRecyclerView extends AppCompatActivity {
+public class SearchItemActivity extends AppCompatActivity {
 
     private RequestQueue queue;
     private SearchResult[] searchResults;
     private RecyclerView recyclerView;
     private ProgressDialog pd;
+    private String searchSite;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,8 @@ public class ActivityRecyclerView extends AppCompatActivity {
         pd.show();
 
         String searchQuery = getIntent().getStringExtra(SEARCH_QUERY);
+        searchSite = getIntent().getStringExtra(SEARCH_SITE);
+
         setTitle(searchQuery);
         searchQuery = searchQuery.replace(" ","%20");
         StringRequest request = new StringRequest(Request.Method.GET, getSearchApi(searchQuery), new Response.Listener<String>() {
@@ -54,7 +57,8 @@ public class ActivityRecyclerView extends AppCompatActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(ActivityRecyclerView.this, "Error Searching...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchItemActivity.this, "Error Searching...", Toast.LENGTH_SHORT).show();
+                pd.dismiss();
             }
         });
 
@@ -62,10 +66,21 @@ public class ActivityRecyclerView extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
+        SearchResult[] results;
+        if (searchSite != null){
+            results = new SearchResult[searchResults.length];
+            int index = 0;
+            for (int i = 0 ; i < searchResults.length; i++){
+                if (searchResults[i].getSiteName().toLowerCase().contains(searchSite)){
+                    results[index++] = searchResults[i];
+                }
+            }
+        } else
+            results = searchResults;
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new SearchAdapter(searchResults, this));
+        recyclerView.setAdapter(new SearchAdapter(results, this));
         pd.dismiss();
     }
 

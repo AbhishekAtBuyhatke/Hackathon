@@ -1,7 +1,11 @@
 package lab.abhishek.apiaiimplementation;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +14,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -48,15 +53,37 @@ import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.ui.AIDialog;
 
+import static lab.abhishek.apiaiimplementation.FlightActivity.getAirportCityList;
+
 public class MainActivity extends AppCompatActivity implements AIDialog.AIDialogListener{
 
     private static final String CLIENT_ACCESS_TOKEN = "c7c906141fde471d9276a82b8fda2c57";
     private static final String TAG = "SpeechResult";
+    public static final String FLIGHT_SRC = "FlightSrc";
+    public static final String FLIGHT_DEST = "FlightDest";
+    public static final String FLIGHT_DATE = "FlightDate";
+    public static final String FLIGHT_COUNT = "FlightCount";
+    public static final String SEARCH_SITE = "search_site";
+    private static final String E_COMMERCE = "E_Commerce_websites";
+    public static final String COUPON_SITE = "coupons_site";
+    public static final String NOTIFICATION_TEXT = "notification_text";
+    public static final String NOTIFICATION_RECEIVER = "notification_receiver";
+
     private TextView tv_query, tv_action, tv_parameter, tv_context, tv_response;
     private TextToSpeech tts;
     public static final String SEARCH_QUERY = "search_query";
     private AIDataService aiDataService;
     private AIDialog aiDialog;
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String text = intent.getStringExtra(NOTIFICATION_TEXT);
+            Toast.makeText(context, "Show dialog", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +92,18 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sharedPreferences = getSharedPreferences("sharedPref",MODE_PRIVATE);
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(NOTIFICATION_RECEIVER));
         tv_query = (TextView) findViewById(R.id.tv_resolved_query);
         tv_action = (TextView) findViewById(R.id.tv_action);
         tv_parameter = (TextView) findViewById(R.id.tv_parameters);
         tv_context = (TextView) findViewById(R.id.tv_context);
         tv_response = (TextView) findViewById(R.id.tv_response);
+
+        if (sharedPreferences.getBoolean("firstTime",true)){
+            getAirportCityList(this);
+            sharedPreferences.edit().putBoolean("firstTime",false).apply();
+        }
 
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -174,15 +208,15 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
     }
 
     @Override
-    public void onResult(AIResponse result) {
+    public void onResult(final AIResponse result) {
         String response = result.getResult().getFulfillment().getSpeech();
         String resolvedQuery = result.getResult().getResolvedQuery();
         final String action = result.getResult().getAction();
         List<AIOutputContext> contexts = result.getResult().getContexts();
-
-        Map<String, JsonElement> paramters = null;
+        Map<String, JsonElement> parameters = result.getResult().getParameters();
+        Map<String, JsonElement> contextParamters = null;
         if (contexts.size() > 0){
-            paramters = contexts.get(0).getParameters();
+            contextParamters = contexts.get(0).getParameters();
         }
 
         HashMap<String, String> map = new HashMap<>();
@@ -198,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
             public void onDone(String utteranceId) {
                 if (!action.contains("_Done")){
                     aiDialog.showAndListen();
+                    result.cleanup();
                 }
 
             }
@@ -210,10 +245,38 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         tv_query.setText(resolvedQuery);
         tv_action.setText(action);
         tv_context.setText(contexts.toString());
-        if(paramters != null) tv_parameter.setText(paramters.toString());
+        if(contextParamters != null) tv_parameter.setText(contextParamters.toString());
         tv_response.setText(response);
 
+        Intent intent;
 
+        if (action.toLowerCase().contains("flightsearch") && action.contains("_Done")){
+            intent = new Intent(this,FlightActivity.class);
+            intent.putExtra(FLIGHT_SRC, contextParamters.get("geo-city").getAsString());
+            intent.putExtra(FLIGHT_DEST, contextParamters.get("geo-city1").getAsString());
+            intent.putExtra(FLIGHT_DATE, contextParamters.get("date").getAsString());
+            if (contextParamters.get("number-integer") != null)
+                intent.putExtra(FLIGHT_COUNT, contextParamters.get("number-integer").getAsInt());
+            else
+                intent.putExtra(FLIGHT_COUNT, 1);
+            startActivity(intent);
+            result.cleanup();
+        } else if (action.contains("searchitem_Done") && parameters.get("any") != null){
+            intent = new Intent(this, SearchItemActivity.class);
+            intent.putExtra(SEARCH_QUERY, parameters.get("any").getAsString());
+            if (parameters.get("E_Commerce_websites") != null){
+                intent.putExtra(SEARCH_SITE, parameters.get("E_Commerce_websites").getAsString());
+            }
+            startActivity(intent);
+            result.cleanup();
+        } else if (action.equals("coupons_Done")){
+            if (parameters.get(E_COMMERCE) != null){
+                intent = new Intent(this, CouponsActivity.class);
+                intent.putExtra(COUPON_SITE,parameters.get(E_COMMERCE).getAsString());
+                startActivity(intent);
+                result.cleanup();
+            }
+        }
 
     }
 
