@@ -7,4 +7,6 @@
     <string name="parameters">Parameters : </string>
     <string name="contexts">Contexts : </string>
     <string name="response">Response : </string>
+    <string name="bh_description">BuyHatke Hackathon</string>
+    <string name="bh_accessibility_service_name">BuyHatke Hackathon</string>
 </resources>
