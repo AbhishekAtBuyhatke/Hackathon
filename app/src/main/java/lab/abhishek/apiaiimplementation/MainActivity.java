@@ -2,6 +2,7 @@ package lab.abhishek.apiaiimplementation;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -48,15 +49,23 @@ import ai.api.model.AIRequest;
 import ai.api.model.AIResponse;
 import ai.api.ui.AIDialog;
 
+import static lab.abhishek.apiaiimplementation.FlightActivity.getAirportCityList;
+
 public class MainActivity extends AppCompatActivity implements AIDialog.AIDialogListener{
 
     private static final String CLIENT_ACCESS_TOKEN = "c7c906141fde471d9276a82b8fda2c57";
     private static final String TAG = "SpeechResult";
+    public static final String FLIGHT_SRC = "FlightSrc";
+    public static final String FLIGHT_DEST = "FlightDest";
+    public static final String FLIGHT_DATE = "FlightDate";
+    public static final String FLIGHT_COUNT = "FlightCount";
+
     private TextView tv_query, tv_action, tv_parameter, tv_context, tv_response;
     private TextToSpeech tts;
     public static final String SEARCH_QUERY = "search_query";
     private AIDataService aiDataService;
     private AIDialog aiDialog;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +74,18 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        sharedPreferences = getSharedPreferences("sharedPref",MODE_PRIVATE);
+
         tv_query = (TextView) findViewById(R.id.tv_resolved_query);
         tv_action = (TextView) findViewById(R.id.tv_action);
         tv_parameter = (TextView) findViewById(R.id.tv_parameters);
         tv_context = (TextView) findViewById(R.id.tv_context);
         tv_response = (TextView) findViewById(R.id.tv_response);
+
+        if (sharedPreferences.getBoolean("firstTime",true)){
+            getAirportCityList(this);
+            sharedPreferences.edit().putBoolean("firstTime",false).apply();
+        }
 
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
@@ -213,7 +229,19 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         if(paramters != null) tv_parameter.setText(paramters.toString());
         tv_response.setText(response);
 
+        Intent intent;
 
+        if (action.toLowerCase().contains("flightsearch") && action.contains("_Done")){
+            intent = new Intent(this,FlightActivity.class);
+            intent.putExtra(FLIGHT_SRC, paramters.get("geo-city").getAsString());
+            intent.putExtra(FLIGHT_DEST, paramters.get("geo-city1").getAsString());
+            intent.putExtra(FLIGHT_DATE, paramters.get("date").getAsString());
+            if (paramters.get("number-integer") != null)
+                intent.putExtra(FLIGHT_COUNT, paramters.get("number-integer").getAsInt());
+            else
+                intent.putExtra(FLIGHT_COUNT, 1);
+            startActivity(intent);
+        }
 
     }
 

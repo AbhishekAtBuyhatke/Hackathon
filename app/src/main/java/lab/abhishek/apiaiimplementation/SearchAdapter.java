@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import lab.abhishek.apiaiimplementation.Models.SearchResult;
 
 /**
  * Created by Abhishek on 09-Jul-17.

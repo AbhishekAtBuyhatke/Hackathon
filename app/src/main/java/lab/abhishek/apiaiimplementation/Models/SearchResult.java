@@ -1,4 +1,4 @@
-package lab.abhishek.apiaiimplementation;
+package lab.abhishek.apiaiimplementation.Models;
 
 /**
  * Created by Abhishek on 09-07-2017.

@@ -1,6 +1,5 @@
 package lab.abhishek.apiaiimplementation;
 
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,7 +16,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import ai.api.services.GoogleRecognitionServiceImpl;
+import lab.abhishek.apiaiimplementation.Models.SearchResult;
 
 import static lab.abhishek.apiaiimplementation.MainActivity.SEARCH_QUERY;
 
