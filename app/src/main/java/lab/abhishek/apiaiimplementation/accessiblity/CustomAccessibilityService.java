@@ -185,6 +185,8 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     private void enableFlightAssistant() {
         maybeHideFloatingButton();
 
+
+
     }
 
 
