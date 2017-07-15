@@ -144,6 +144,7 @@ public class FlightActivity extends AppCompatActivity {
                         allFlightData = journeyDetails;
                         callFlightResultAPIwithDelay();
                         adapter.appendFlightData(allFlightData);
+                        //findViewById(R.id.flight_progress_bar).setVisibility(View.GONE);
                     }
                 }
             }

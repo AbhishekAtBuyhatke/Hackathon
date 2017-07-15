@@ -1,7 +1,10 @@
 package lab.abhishek.apiaiimplementation;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -11,6 +14,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -62,12 +66,23 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
     public static final String SEARCH_SITE = "search_site";
     private static final String E_COMMERCE = "E_Commerce_websites";
     public static final String COUPON_SITE = "coupons_site";
+    public static final String NOTIFICATION_TEXT = "notification_text";
+    public static final String NOTIFICATION_RECEIVER = "notification_receiver";
 
     private TextView tv_query, tv_action, tv_parameter, tv_context, tv_response;
     private TextToSpeech tts;
     public static final String SEARCH_QUERY = "search_query";
     private AIDataService aiDataService;
     private AIDialog aiDialog;
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String text = intent.getStringExtra(NOTIFICATION_TEXT);
+            Toast.makeText(context, "Show dialog", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     private SharedPreferences sharedPreferences;
 
     @Override
@@ -78,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         setSupportActionBar(toolbar);
 
         sharedPreferences = getSharedPreferences("sharedPref",MODE_PRIVATE);
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(NOTIFICATION_RECEIVER));
         tv_query = (TextView) findViewById(R.id.tv_resolved_query);
         tv_action = (TextView) findViewById(R.id.tv_action);
         tv_parameter = (TextView) findViewById(R.id.tv_parameters);
