@@ -251,6 +251,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         aiDialog = new AIDialog(this, config);
         aiDialog.showAndListen();
         aiDialog.setResultsListener(this);
+
     }
 
     @Override
