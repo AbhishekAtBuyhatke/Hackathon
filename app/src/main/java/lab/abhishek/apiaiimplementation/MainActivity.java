@@ -1,11 +1,13 @@
 package lab.abhishek.apiaiimplementation;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -14,6 +16,8 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -57,7 +61,7 @@ import static lab.abhishek.apiaiimplementation.FlightActivity.getAirportCityList
 
 public class MainActivity extends AppCompatActivity implements AIDialog.AIDialogListener{
 
-    private static final String CLIENT_ACCESS_TOKEN = "c7c906141fde471d9276a82b8fda2c57";
+    public static final String CLIENT_ACCESS_TOKEN = "c7c906141fde471d9276a82b8fda2c57";
     private static final String TAG = "SpeechResult";
     public static final String FLIGHT_SRC = "FlightSrc";
     public static final String FLIGHT_DEST = "FlightDest";
@@ -91,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        askPermission();
 
         sharedPreferences = getSharedPreferences("sharedPref",MODE_PRIVATE);
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, new IntentFilter(NOTIFICATION_RECEIVER));
@@ -127,6 +133,13 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
                 aiDialog.showAndListen();
             }
         });
+    }
+
+    private void askPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.RECORD_AUDIO},101);
+        }
     }
 
     private void sendRequest() {

@@ -17,14 +17,20 @@ import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import ai.api.android.AIConfiguration;
+import ai.api.model.AIError;
+import ai.api.model.AIResponse;
+import ai.api.ui.AIDialog;
 import lab.abhishek.apiaiimplementation.MainActivity;
 import lab.abhishek.apiaiimplementation.R;
+
+import static lab.abhishek.apiaiimplementation.MainActivity.CLIENT_ACCESS_TOKEN;
 
 /**
  * Created by Bhargav on 15/07/17.
  */
 
-public class CustomAccessibilityService extends AccessibilityService implements ReadContent.ReadInterface, View.OnTouchListener {
+public class CustomAccessibilityService extends AccessibilityService implements ReadContent.ReadInterface, View.OnTouchListener, AIDialog.AIDialogListener {
 
     private static final String TAG = "CustomAccessibility";
     private static final String APP_NAME = "app_name";
@@ -47,6 +53,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     private final int SHOPPING = 1;
     private final int FLIGHT = 31;
     private String currentAppName = "";
+    private AIDialog aiDialog;
 
     @Override
     protected void onServiceConnected() {
@@ -117,11 +124,17 @@ public class CustomAccessibilityService extends AccessibilityService implements 
 
         Log.d(TAG, event.getContentDescription()+"-------------->");
         if (packageName.equals("com.snapdeal.main")) {
-            currentAppName = "snapDeal";
-            readContent.read(getRootInActiveWindow());
+            maybeShowFloatingButton();
+            //currentAppName = "snapDeal";
+            //readContent.read(getRootInActiveWindow());
         } else if(packageName.equals("com.makemytrip")){
-            currentAppName = "MAkeMyTrip";
-            readContent.read(getRootInActiveWindow());
+            maybeShowFloatingButton();
+            //currentAppName = "MAkeMyTrip";
+            //readContent.read(getRootInActiveWindow());
+        } else if (packageName.toString().contains("flipkart")){
+            maybeShowFloatingButton();
+        } else if (packageName.toString().contains("amazon")) {
+            maybeShowFloatingButton();
         } else {
             maybeHideFloatingButton();
         }
@@ -211,6 +224,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
 
 
     private void maybeShowFloatingButton() {
+            speak();
             if (!assistantVisible) {
                 WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
                 szWindow = new Point();
@@ -228,6 +242,17 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 windowManager.addView(assistant, assistantLayoutParams);
                 assistantVisible = true;
             }
+
+    }
+
+    public void speak(){
+        final AIConfiguration config = new AIConfiguration(CLIENT_ACCESS_TOKEN,
+                AIConfiguration.SupportedLanguages.English,
+                AIConfiguration.RecognitionEngine.System);
+
+        aiDialog = new AIDialog(this, config);
+        aiDialog.showAndListen();
+        aiDialog.setResultsListener(this);
     }
 
     @Override
@@ -253,4 +278,18 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         return moveThreshHold < 10;
     }
 
+    @Override
+    public void onResult(AIResponse result) {
+
+    }
+
+    @Override
+    public void onError(AIError error) {
+
+    }
+
+    @Override
+    public void onCancelled() {
+
+    }
 }
