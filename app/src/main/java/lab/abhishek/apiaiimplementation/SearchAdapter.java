@@ -41,13 +41,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         setShippingPriceText(holder, position);
         setShipingTimeText(holder, position);
         String siteIcon = mSearchResults[position].getSiteImage();
-        holder.alertIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //               if(appId != null)
-               // doSetAlert(mSearchResults[searchPosition].getLink());
-            }
-        });
 
         if(siteIcon != null){
             String temp = siteIcon.substring(35);
@@ -94,7 +87,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         private TextView shippingTime;
         private ImageView productImage;
         private ImageView siteIcon;
-        private Button alertIcon;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -105,7 +97,6 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             shippingTime = (TextView) itemView.findViewById(R.id.shipping_time);
             productImage = (ImageView) itemView.findViewById(R.id.product_image);
             siteIcon = (ImageView) itemView.findViewById(R.id.site_icon);
-            alertIcon = (Button) itemView.findViewById(R.id.set_alert);
         }
     }
 }

@@ -53,7 +53,7 @@ public class FlightActivity extends AppCompatActivity {
     public static final String _ID = "_id";
     private static final String TEXT_TYPE = " TEXT";
     private static final String COMMA_SEP = ",";
-    private TextView editTv, dateNClass, tvSource, tvDest, travellersDetail;
+    private TextView dateNClass, tvSource, tvDest, travellersDetail;
     private SharedPreferences sharedPref;
     private FlightJourney allFlightData;
     private FlightResultAdapter adapter;
@@ -68,7 +68,6 @@ public class FlightActivity extends AppCompatActivity {
         Intent intent = getIntent();
         sharedPref = getSharedPreferences("sharedPref",MODE_PRIVATE);
 
-        editTv = (TextView) findViewById(R.id.tv_flight_edit);
         dateNClass = (TextView) findViewById(R.id.tv_flight_date_class);
         tvSource = (TextView) findViewById(R.id.tv_flight_origin);
         tvDest = (TextView) findViewById(R.id.tv_flight_destination);
@@ -83,10 +82,13 @@ public class FlightActivity extends AppCompatActivity {
         flightData.setDestinationPlace(dest);
         flightData.setDestinationCode(getAirportCode(dest));
         flightData.setDepartureDate(intent.getStringExtra(FLIGHT_DATE));
+        flightData.setReturnDate("");
         flightData.setAdults(""+intent.getIntExtra(FLIGHT_COUNT,1));
         flightData.setChildren("0");
         flightData.setInfants("0");
         flightData.setCabinClass("Economy");
+        flightData.setOneWayJourney(true);
+        Log.d("Hohoho",flightData.toString());
 
         setUpRecyclerView();
         setupToolbar(flightData);
@@ -137,6 +139,7 @@ public class FlightActivity extends AppCompatActivity {
                     } else if(journeyDetails.getStatus().equals(FLIGHT_UPDATE_COMPLETE_STATUS)) {
                         allFlightData = journeyDetails;
                         adapter.appendFlightData(allFlightData);
+                        findViewById(R.id.flight_progress_bar).setVisibility(View.GONE);
                     } else {
                         allFlightData = journeyDetails;
                         callFlightResultAPIwithDelay();

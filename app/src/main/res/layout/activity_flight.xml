@@ -47,22 +47,6 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tv_flight_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:paddingRight="10dp"
-            android:paddingLeft="5dp"
-            android:layout_alignParentRight="true"
-            android:text="EDIT"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"
-            android:drawableTop="@drawable/ic_edit"
-            android:drawableTint="#fff"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
         <ImageView
             android:id="@+id/iv_ic_today"
             android:layout_width="15dp"
@@ -108,10 +92,23 @@
 
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_flight"
-        android:layout_below="@+id/rl_result_topbar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_below="@+id/rl_result_topbar">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_flight"
+            android:background="#d7d7d7"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ProgressBar
+            android:id="@+id/flight_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true" />
+
+    </RelativeLayout>
 
 </RelativeLayout>
