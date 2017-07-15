@@ -52,7 +52,6 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     private final int COUPONS = 21;
     private final int SHOPPING = 1;
     private final int FLIGHT = 31;
-    private int currentAppType = -1;
     private String currentAppName = "";
     private AIDialog aiDialog;
 
@@ -118,7 +117,11 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         packageName = event.getPackageName();
 
         Log.d(TAG, "className:--> " + className + "\n source--> " + source + "\npackageName--> " + packageName);
+        if(packageName.equals("lab.abhishek.apiaiimplementation"))
+            return;
         String eventText = null;
+        productPageEvent = new ProductPageEvent();
+
         Log.d(TAG, event.getContentDescription()+"-------------->");
         if (packageName.equals("com.snapdeal.main")) {
             maybeShowFloatingButton();
@@ -164,7 +167,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     }
 
     private void onAssistantButtonClick() {
-        switch (currentAppType) {
+        switch (productPageEvent.appType) {
             case COUPONS:
                 enableCouponAssistant();
                 break;
@@ -180,6 +183,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     }
 
     private void enableFlightAssistant() {
+        maybeHideFloatingButton();
 
     }
 
@@ -196,6 +200,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
 
     private void enableShoppingAssistant() {
         Log.d(TAG, "enableShoppingAssistant()");
+        maybeHideFloatingButton();
         if (productPageEvent != null && productPageEvent.product != null) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
@@ -208,6 +213,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     }
 
     private void enableCouponAssistant() {
+        maybeHideFloatingButton();
         Intent intent = new Intent(this, MainActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         intent.putExtra(APP_NAME, currentAppName);
@@ -225,7 +231,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 assistant = new ImageView(this);
                 assistant.setImageResource(R.drawable.bh_ic_assistant);
                 assistant.setOnTouchListener(this);
-                int imageSize = 30;
+                int imageSize = 150;
                 assistantLayoutParams = new WindowManager.LayoutParams(imageSize, imageSize,
                         WindowManager.LayoutParams.TYPE_PHONE,
                         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -261,15 +267,6 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                     return true;
                 }
                 return true;
-
-            case MotionEvent.ACTION_MOVE:
-                Log.d(TAG, "ACTION_MOVE "  + "  x: " +
-                        event.getRawX() + "  y: " + event.getRawY() + "  szWindow.x: " + szWindow.x);
-                assistantLayoutParams.x = initialX + (int) (event.getRawX() - initialTouchX);
-                assistantLayoutParams.y = initialY + (int) (event.getRawY() - initialTouchY);
-                windowManager.updateViewLayout(assistant, assistantLayoutParams);
-                return true;
-
         }
         return false;
     }
