@@ -15,6 +15,11 @@ public class ProductPageEvent {
         this.product = product;
     }
 
+
+    public ProductPageEvent(FlightData flightData, boolean isFlightPage) {
+        this.flightData = flightData;
+        this.isFlightApp = isFlightPage;
+    }
     @Override
     public String toString() {
         return "ProductPageEvent{" +
