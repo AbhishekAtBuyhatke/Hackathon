@@ -11,18 +11,20 @@ public class ReadContent {
     private ReadInterface readInterface;
     private ReadContentTask runningTask;
     private boolean isRunning = false;
+    private String appName;
 
 
     public ReadContent(ReadInterface readInterface) {
         this.readInterface = readInterface;
     }
 
-    public void read(AccessibilityNodeInfo node) {
+    public void read(AccessibilityNodeInfo node, String appName) {
         Log.d(TAG,"read() of readContent");
         if (runningTask != null) {
             runningTask.cancel(true);
             runningTask = null;
         }
+        this.appName = appName;
         runningTask = new ReadContentTask();
         runningTask.execute(node);
     }
@@ -41,7 +43,11 @@ public class ReadContent {
                 Log.d(TAG,"ReadContentTask extends AsyncTask doInBackground()");
                 AccessibilityNodeInfo node = params[0];
                 isRunning = true;
-                ProductPageEvent event = ReadSnapdeal.read(node);
+                ProductPageEvent event = null;
+                if(appName.equals("snapDeal"))
+                     event = ReadSnapdeal.read(node);
+                else if(appName.equals("MakeMyTrip"))
+                    event = ReadMakeMyTrip.read(node);
                 return event;
             } catch (Exception e) {
                 return null;
