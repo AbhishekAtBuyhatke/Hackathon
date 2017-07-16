@@ -84,6 +84,8 @@ public class OverlayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.overlay_acitivity);
         recyclerView = (RecyclerView) findViewById(R.id.rv_list);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
 
         pd = new ProgressDialog(this);
         queue = Volley.newRequestQueue(this);
@@ -217,8 +219,6 @@ public class OverlayActivity extends AppCompatActivity {
     }
 
     private void setUpRecyclerView() {
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setHasFixedSize(true);
         adapter = new FlightResultAdapter(this);
         recyclerView.setAdapter(adapter);
     }
