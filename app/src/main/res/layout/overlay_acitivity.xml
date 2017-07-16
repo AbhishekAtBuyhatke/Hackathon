@@ -10,8 +10,95 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp">
 
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/rl_result_topbar"
+        android:layout_width="match_parent"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="6dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tv_flight_origin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bangalore"
+            android:layout_alignParentLeft="true"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/iv_right_arrow"
+            android:layout_width="25dp"
+            android:layout_height="16dp"
+            android:layout_marginTop="2dp"
+            app:srcCompat="@drawable/ic_arrow_forward"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="2dp"
+            android:layout_toRightOf="@+id/tv_flight_origin"
+            android:tint="#fff"/>
+
+        <TextView
+            android:id="@+id/tv_flight_destination"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Delhi"
+            android:layout_toRightOf="@id/iv_right_arrow"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/iv_ic_today"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/tv_flight_origin"
+            android:layout_marginRight="5dp"
+            app:srcCompat="@drawable/ic_today_black_24px"
+            android:tint="#fff" />
+
+        <TextView
+            android:id="@+id/tv_flight_date_class"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="31 May - 2 July | Economy"
+            android:gravity="center"
+            android:layout_toRightOf="@id/iv_ic_today"
+            android:textColor="#fff"
+            android:layout_below="@+id/tv_flight_origin"
+            android:textSize="12sp"
+            android:textStyle="normal" />
+
+        <ImageView
+            android:id="@+id/iv_ic_people"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:background="@android:color/transparent"
+            android:layout_below="@+id/tv_flight_date_class"
+            app:srcCompat="@drawable/ic_group"
+            android:tint="#fff"
+            android:layout_marginRight="5dp"/>
+
+        <TextView
+            android:id="@+id/tv_travellers_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_below="@+id/tv_flight_date_class"
+            android:textColor="#fff"
+            android:textSize="12sp"
+            android:layout_toRightOf="@id/iv_ic_people"
+            android:text="1 Adult, 2 Children, 1 Infant"/>
+
+    </RelativeLayout>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_list"
+        android:layout_below="@+id/rl_result_topbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
