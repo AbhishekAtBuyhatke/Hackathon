@@ -87,6 +87,14 @@ public class OverlayActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
+
+        sharedPref = getSharedPreferences("sharedPref",MODE_PRIVATE);
+        dateNClass = (TextView) findViewById(R.id.tv_flight_date_class);
+        tvSource = (TextView) findViewById(R.id.tv_flight_origin);
+        tvDest = (TextView) findViewById(R.id.tv_flight_destination);
+        travellersDetail = (TextView) findViewById(R.id.tv_travellers_detail);
+
+
         pd = new ProgressDialog(this);
         queue = Volley.newRequestQueue(this);
         gson = new Gson();
@@ -94,6 +102,7 @@ public class OverlayActivity extends AppCompatActivity {
 
         token = getIntent().getStringExtra(tag);
 
+        database = openOrCreateDatabase("Database",MODE_PRIVATE,null);
         switch (token){
             case "COUPONS" :
                 pd.setMessage("Loading...");
@@ -201,12 +210,10 @@ public class OverlayActivity extends AppCompatActivity {
                         pd.dismiss();
                         allFlightData = journeyDetails;
                         adapter.appendFlightData(allFlightData);
-                        findViewById(R.id.flight_progress_bar).setVisibility(View.GONE);
                     } else {
                         allFlightData = journeyDetails;
                         callFlightResultAPIwithDelay();
                         adapter.appendFlightData(allFlightData);
-                        //findViewById(R.id.flight_progress_bar).setVisibility(View.GONE);
                     }
                 }
             }
