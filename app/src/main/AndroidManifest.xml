@@ -50,6 +50,15 @@
         <activity android:name=".accessiblity.OverlayActivity"
             android:theme="@style/MainTheme">
         </activity>
+
+        <service
+            android:name=".MyNotificationService"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
