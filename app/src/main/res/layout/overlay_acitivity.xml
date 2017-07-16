@@ -5,7 +5,6 @@
     android:id="@+id/overlay"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_vertical"
     android:orientation="vertical"
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp">
@@ -13,7 +12,8 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="500dp"
+        android:layout_centerInParent="true">
 
     </android.support.v7.widget.RecyclerView>
 </RelativeLayout>
