@@ -199,9 +199,9 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         if (productPageEvent != null && productPageEvent.product != null) {
             Intent intent = new Intent(this, OverlayActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-            intent.putExtra(APP_NAME, currentAppName);
-            intent.putExtra(PRODUCT_NAME, productPageEvent.product);
-            intent.putExtra("APP_TYPE","SHOPPING");
+            //intent.putExtra(APP_NAME, currentAppName);
+            intent.putExtra("SearchQuery", productPageEvent.product);
+            intent.putExtra("adapter_flag","PRODUCT");
             startActivity(intent);
         } else {
             Log.d(TAG, "wont identify Product");
@@ -212,7 +212,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         maybeHideFloatingButton();
         Intent intent = new Intent(this, OverlayActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-        intent.putExtra("APP_TYPE","COUPONS");
+        intent.putExtra("adapter_flag","COUPONS");
         intent.putExtra(APP_NAME, currentAppName);
         startActivity(intent);
     }
