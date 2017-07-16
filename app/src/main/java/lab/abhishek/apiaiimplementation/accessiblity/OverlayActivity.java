@@ -82,7 +82,7 @@ public class OverlayActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        setContentView(R.layout.overlay_acitivity);
         recyclerView = (RecyclerView) findViewById(R.id.rv_list);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
