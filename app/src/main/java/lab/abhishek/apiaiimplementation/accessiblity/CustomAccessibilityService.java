@@ -59,7 +59,6 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     private AIDialog aiDialog;
     private TextToSpeech t1;
     private int previousAppTYpe= -1;
-    private  boolean shouldSpeak = true;
 
     @Override
     protected void onServiceConnected() {
@@ -240,9 +239,8 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 assistantVisible = true;
             }
 
-            if(shouldSpeak || productPageEvent.appType != previousAppTYpe) {
+            if(previousAppTYpe == -1 || productPageEvent.appType != previousAppTYpe) {
                 previousAppTYpe = productPageEvent.appType;
-                shouldSpeak = false;
                 speakTts();
             }
 
@@ -256,14 +254,14 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 break;
 
             case SHOPPING:
-                toSpeak = toSpeak + "you are browsing " + productPageEvent.product + "click to see chippest price";
+                toSpeak = toSpeak + "you are browsing " + productPageEvent.product + "click to see cheapest price";
                 break;
 
             case FLIGHT:
                 toSpeak = toSpeak + "you are searching flight" +
                         " from   " +productPageEvent.flightData.getOriginPlace()+
                         "  to " + productPageEvent.flightData.getDestinationPlace() +
-                        " click to see chippest price";
+                        " click to see cheapest price";
                 break;
         }
 
