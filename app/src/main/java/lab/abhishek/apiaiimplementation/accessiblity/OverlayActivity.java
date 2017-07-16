@@ -90,6 +90,7 @@ public class OverlayActivity extends AppCompatActivity {
         pd = new ProgressDialog(this);
         queue = Volley.newRequestQueue(this);
         gson = new Gson();
+        retrofit = getRetrofitClient();
 
         token = getIntent().getStringExtra(tag);
 
