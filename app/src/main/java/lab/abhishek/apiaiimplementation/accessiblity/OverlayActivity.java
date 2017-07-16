@@ -137,10 +137,13 @@ public class OverlayActivity extends AppCompatActivity {
                 break;
 
             case "FLIGHT" :
+                findViewById(R.id.rl_result_topbar).setVisibility(View.VISIBLE);
                 pd.setMessage("Loading...");
                 pd.show();
                 setUpRecyclerView();
                 flightData = getIntent().getParcelableExtra("FLIGHT_DATA");
+                flightData.setOriginCode(getAirportCode(flightData.getOriginPlace()));
+                flightData.setDestinationCode(getAirportCode(flightData.getDestinationPlace()));
                 setupToolbar(flightData);
                 getFlightSession(flightData);
         }
