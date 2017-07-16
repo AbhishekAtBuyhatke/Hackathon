@@ -61,6 +61,9 @@ public class ReadContent {
             if (event != null && event.product != null && !event.product.equals("null")){
                 Log.d(TAG,event.toString() +"\n if con");
                 readInterface.onRead(event);
+            } else if(event != null && event.flightData != null) {
+                Log.d(TAG,event.toString() +"\n if con");
+                readInterface.onRead(event);
             } else {
                 Log.d(TAG,"Read content not able to find product \n else con") ;
                 readInterface.onRead(null);

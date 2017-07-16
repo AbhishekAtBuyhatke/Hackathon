@@ -57,7 +57,9 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     private final int FLIGHT = 31;
     private String currentAppName = "";
     private AIDialog aiDialog;
-    private TextToSpeech t1;;
+    private TextToSpeech t1;
+    private int previousAppTYpe= -1;
+    private  boolean shouldSpeak = true;
 
     @Override
     protected void onServiceConnected() {
@@ -137,6 +139,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 }
             } else if(event.isFlightApp) {
                 productPageEvent.appType = FLIGHT;
+                productPageEvent.flightData = event.flightData;
             } else {
                 productPageEvent.appType = COUPONS;
             }
@@ -235,11 +238,12 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 assistantLayoutParams.gravity = Gravity.CENTER | Gravity.LEFT;
                 windowManager.addView(assistant, assistantLayoutParams);
                 assistantVisible = true;
+            }
 
-
+            if(shouldSpeak || productPageEvent.appType != previousAppTYpe) {
+                previousAppTYpe = productPageEvent.appType;
+                shouldSpeak = false;
                 speakTts();
-
-
             }
 
     }
@@ -253,12 +257,13 @@ public class CustomAccessibilityService extends AccessibilityService implements 
 
             case SHOPPING:
                 toSpeak = toSpeak + "you are browsing " + productPageEvent.product + "click to see chippest price";
-                enableShoppingAssistant();
                 break;
 
             case FLIGHT:
-                toSpeak = toSpeak + "you are searching flight click to see chippesr price";
-                enableFlightAssistant();
+                toSpeak = toSpeak + "you are searching flight" +
+                        " from   " +productPageEvent.flightData.getOriginPlace()+
+                        "  to " + productPageEvent.flightData.getDestinationPlace() +
+                        " click to see chippest price";
                 break;
         }
 
