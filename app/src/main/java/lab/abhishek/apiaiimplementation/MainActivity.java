@@ -262,7 +262,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
 
         Intent intent;
 
-        if (action.toLowerCase().contains("flightsearch") && action.contains("_Done") &&
+        if (action.equals("FlightSearch.FlightSearch-custom.FlightSearch-SourceDestination-custom.FlightSearch-Date-custom_Done") &&
                 contextParamters.get("geo-city") != null &&
                 contextParamters.get("geo-city1") != null &&
                 contextParamters.get("date") != null){

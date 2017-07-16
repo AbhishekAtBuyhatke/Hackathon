@@ -49,10 +49,10 @@ public class FlightActivity extends AppCompatActivity {
     public static final String COLUMN_NAME_AIRPORT_CODE = "airport_code";
     public static final String COLUMN_NAME_COUNTRY_NAME = "country";
     public static final String COLUMN_NAME_AIRPORT_ALIAS = "airport_alias";
-    private static final String FLIGHT_UPDATE_COMPLETE_STATUS = "UpdatesComplete";
+    public static final String FLIGHT_UPDATE_COMPLETE_STATUS = "UpdatesComplete";
     public static final String _ID = "_id";
-    private static final String TEXT_TYPE = " TEXT";
-    private static final String COMMA_SEP = ",";
+    public static final String TEXT_TYPE = " TEXT";
+    public static final String COMMA_SEP = ",";
     private TextView dateNClass, tvSource, tvDest, travellersDetail;
     private SharedPreferences sharedPref;
     private FlightJourney allFlightData;
@@ -173,7 +173,7 @@ public class FlightActivity extends AppCompatActivity {
         return postParams;
     }
 
-    private void setupToolbar(FlightData flightData) {
+    public void setupToolbar(FlightData flightData) {
         tvSource.setText(flightData.getOriginPlace());
         tvDest.setText(flightData.getDestinationPlace());
         dateNClass.setText(flightData.getDepartureDate() +" | " + flightData.getCabinClass() );
