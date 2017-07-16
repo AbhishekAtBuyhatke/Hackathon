@@ -26,8 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.JsonElement;
-import com.ibm.watson.developer_cloud.android.library.audio.StreamPlayer;
-import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -64,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
     public static final String NOTIFICATION_TEXT = "notification_text";
     public static final String NOTIFICATION_RECEIVER = "notification_receiver";
     private static final String[] welcome = new String[]{"Hey!","Welcome!","How Can I help you today?"};
-    private StreamPlayer streamPlayer;
 
     /*
     "url": "https://stream.watsonplatform.net/text-to-speech/api",
