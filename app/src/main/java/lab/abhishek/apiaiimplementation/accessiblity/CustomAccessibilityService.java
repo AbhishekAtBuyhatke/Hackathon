@@ -5,6 +5,7 @@ import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -16,6 +17,8 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import java.util.Locale;
 
 import ai.api.android.AIConfiguration;
 import ai.api.model.AIError;
@@ -54,6 +57,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     private final int FLIGHT = 31;
     private String currentAppName = "";
     private AIDialog aiDialog;
+    private TextToSpeech t1;;
 
     @Override
     protected void onServiceConnected() {
@@ -77,37 +81,19 @@ public class CustomAccessibilityService extends AccessibilityService implements 
 
     private void init() {
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        t1=new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.getDefault());
+                }
+            }
+        });
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
         // Log.d(TAG, "onAccessibilityEvent() -->" + event.getEventType());
-       /* switch (event.getEventType()) {
-            case AccessibilityEvent.TYPE_VIEW_CLICKED:
-                Log.d(TAG, "BHARGAV\n" + "TYPE_VIEW_CLICKED || CONTENT_CHANGE_TYPE_SUBTREE");
-                break;
-            case AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED:
-                Log.d(TAG, "BHARGAV\n" +  "TYPE_NOTIFICATION_STATE_CHANGED");
-                break;
-            case AccessibilityEvent.TYPE_VIEW_CONTEXT_CLICKED:
-                Log.d(TAG, "BHARGAV\n" +  "TYPE_VIEW_CONTEXT_CLICKED");
-                break;
-            case AccessibilityEvent.TYPE_WINDOWS_CHANGED:
-                Log.d(TAG, "BHARGAV\n  " +  "TYPE_WINDOWS_CHANGED");
-                break;
-            case AccessibilityEvent.CONTENT_CHANGE_TYPE_TEXT:
-                Log.d(TAG, "BHARGAV\n" +  "CONTENT_CHANGE_TYPE_TEXT");
-                break;
-            case AccessibilityEvent.CONTENT_CHANGE_TYPE_CONTENT_DESCRIPTION:
-                Log.d(TAG, "BHARGAV\n" +  "CONTENT_CHANGE_TYPE_CONTENT_DESCRIPTION");
-                break;
-            case AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED:
-                Log.d(TAG, "BHARGAV\n" + "TYPE_WINDOW_CONTENT_CHANGED");
-                break;
-            case AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED:
-                Log.d(TAG, "BHARGAV\n" + "TYPE_WINDOW_STATE_CHANGED");
-                break;
-        }*/
 
         int type = -1;
         CharSequence className = "", source = "", packageName = "";
@@ -122,19 +108,14 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         String eventText = null;
         productPageEvent = new ProductPageEvent();
 
-        Log.d(TAG, event.getContentDescription()+"-------------->");
+        //Log.d(TAG, event.getContentDescription()+"-------------->");
         if (packageName.equals("com.snapdeal.main")) {
-            maybeShowFloatingButton();
-            //currentAppName = "snapDeal";
-            //readContent.read(getRootInActiveWindow());
+            currentAppName = "snapDeal";
+            readContent.read(getRootInActiveWindow(),"snapDeal");
         } else if(packageName.equals("com.makemytrip")){
-            maybeShowFloatingButton();
-            //currentAppName = "MAkeMyTrip";
-            //readContent.read(getRootInActiveWindow());
-        } else if (packageName.toString().contains("flipkart")){
-            maybeShowFloatingButton();
-        } else if (packageName.toString().contains("amazon")) {
-            maybeShowFloatingButton();
+            //maybeShowFloatingButton();
+            currentAppName = "MAkeMyTrip";
+            readContent.read(getRootInActiveWindow(),"MakeMyTrip");
         } else {
             maybeHideFloatingButton();
         }
@@ -156,11 +137,17 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 }
             } else if(event.isFlightApp) {
                 productPageEvent.appType = FLIGHT;
+            } else {
+                productPageEvent.appType = COUPONS;
             }
-            productPageEvent.appType = COUPONS;
             maybeShowFloatingButton();
             Log.d(TAG, event.toString());
-        }else{
+        } else if(event == null && currentAppName.equals("snapDeal")){
+            productPageEvent = new ProductPageEvent();
+            productPageEvent.appType = COUPONS;
+            maybeShowFloatingButton();
+        }
+        else{
             maybeHideFloatingButton();
         }
 
@@ -183,17 +170,23 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     }
 
     private void enableFlightAssistant() {
-        maybeHideFloatingButton();
-
-
-
+        if (productPageEvent != null && productPageEvent.flightData != null) {
+            Intent intent = new Intent(this, OverlayActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+            intent.putExtra(APP_NAME, currentAppName);
+            intent.putExtra("FLIGHT_DATA", productPageEvent.flightData);
+            intent.putExtra("APP_TYPE","FLIGHT");
+            startActivity(intent);
+        } else {
+            Log.d(TAG, "wont identify flight");
+        }
     }
 
 
     private void maybeHideFloatingButton() {//TODO dont call this method for unsupportd app
         Log.d(TAG, "maybeHideFloatingButton()");
         if (assistantVisible) {
-            WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+            windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
             windowManager.removeViewImmediate(assistant);
             assistantVisible = false;
             assistant = null;
@@ -204,10 +197,11 @@ public class CustomAccessibilityService extends AccessibilityService implements 
         Log.d(TAG, "enableShoppingAssistant()");
         maybeHideFloatingButton();
         if (productPageEvent != null && productPageEvent.product != null) {
-            Intent intent = new Intent(this, MainActivity.class);
+            Intent intent = new Intent(this, OverlayActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
             intent.putExtra(APP_NAME, currentAppName);
             intent.putExtra(PRODUCT_NAME, productPageEvent.product);
+            intent.putExtra("APP_TYPE","SHOPPING");
             startActivity(intent);
         } else {
             Log.d(TAG, "wont identify Product");
@@ -216,21 +210,21 @@ public class CustomAccessibilityService extends AccessibilityService implements 
 
     private void enableCouponAssistant() {
         maybeHideFloatingButton();
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, OverlayActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        intent.putExtra("APP_TYPE","COUPONS");
         intent.putExtra(APP_NAME, currentAppName);
         startActivity(intent);
     }
 
 
     private void maybeShowFloatingButton() {
-            speak();
             if (!assistantVisible) {
-                WindowManager windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+                windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
                 szWindow = new Point();
                 display = windowManager.getDefaultDisplay();
                 display.getSize(szWindow);
-                assistant = new ImageView(this);
+                assistant = new ImageView(CustomAccessibilityService.this);
                 assistant.setImageResource(R.drawable.bh_ic_assistant);
                 assistant.setOnTouchListener(this);
                 int imageSize = 150;
@@ -241,19 +235,34 @@ public class CustomAccessibilityService extends AccessibilityService implements 
                 assistantLayoutParams.gravity = Gravity.CENTER | Gravity.LEFT;
                 windowManager.addView(assistant, assistantLayoutParams);
                 assistantVisible = true;
+
+
+                speakTts();
+
+
             }
 
     }
 
-    public void speak(){
-        final AIConfiguration config = new AIConfiguration(CLIENT_ACCESS_TOKEN,
-                AIConfiguration.SupportedLanguages.English,
-                AIConfiguration.RecognitionEngine.System);
+    private void speakTts() {
+        String toSpeak = "Hi";
+        switch (productPageEvent.appType) {
+            case COUPONS:
+                toSpeak = toSpeak + "We have SnapDeal coupons       click to see coupons";
+                break;
 
-        aiDialog = new AIDialog(this, config);
-        aiDialog.showAndListen();
-        aiDialog.setResultsListener(this);
+            case SHOPPING:
+                toSpeak = toSpeak + "you are browsing " + productPageEvent.product + "click to see chippest price";
+                enableShoppingAssistant();
+                break;
 
+            case FLIGHT:
+                toSpeak = toSpeak + "you are searching flight click to see chippesr price";
+                enableFlightAssistant();
+                break;
+        }
+
+        t1.speak(toSpeak, TextToSpeech.QUEUE_FLUSH, null);
     }
 
     @Override
