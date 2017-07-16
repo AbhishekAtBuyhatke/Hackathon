@@ -1,54 +1,45 @@
 package lab.abhishek.apiaiimplementation;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Message;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.ibm.watson.developer_cloud.android.library.audio.StreamPlayer;
+import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
-import ai.api.AIListener;
 import ai.api.AIServiceException;
 import ai.api.RequestExtras;
 import ai.api.android.AIConfiguration;
 import ai.api.android.AIDataService;
-import ai.api.android.AIService;
 import ai.api.model.AIContext;
 import ai.api.model.AIError;
 import ai.api.model.AIEvent;
@@ -72,12 +63,21 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
     public static final String COUPON_SITE = "coupons_site";
     public static final String NOTIFICATION_TEXT = "notification_text";
     public static final String NOTIFICATION_RECEIVER = "notification_receiver";
+    private static final String[] welcome = new String[]{"Hey!","Welcome!","How Can I help you today?"};
+    private StreamPlayer streamPlayer;
+
+    /*
+    "url": "https://stream.watsonplatform.net/text-to-speech/api",
+  "username": "0f95da2d-34c5-4787-b8ff-5b2ad23eaf64",
+  "password": "EZd8mTesn6LM"
+     */
 
     private TextView tv_query, tv_action, tv_parameter, tv_context, tv_response;
-    private TextToSpeech tts;
+    //private TextToSpeech tts;
     public static final String SEARCH_QUERY = "search_query";
     private AIDataService aiDataService;
     private AIDialog aiDialog;
+    private boolean continueListening;
 
     BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
     };
 
     private SharedPreferences sharedPreferences;
+    private android.speech.tts.TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
             @Override
             public void onClick(View view) {
                 aiDialog.showAndListen();
+                continueListening = true;
             }
         });
     }
@@ -222,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
 
     @Override
     public void onResult(final AIResponse result) {
-        String response = result.getResult().getFulfillment().getSpeech();
+        final String response = result.getResult().getFulfillment().getSpeech();
         String resolvedQuery = result.getResult().getResolvedQuery();
         final String action = result.getResult().getAction();
         List<AIOutputContext> contexts = result.getResult().getContexts();
@@ -233,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
         }
 
         HashMap<String, String> map = new HashMap<>();
+        //new WatsonTask().execute(response);
         map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "message_id");
         tts.speak(response, TextToSpeech.QUEUE_FLUSH, map);
         tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
@@ -243,9 +246,8 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
 
             @Override
             public void onDone(String utteranceId) {
-                if (!action.contains("_Done")){
+                if (continueListening){
                     aiDialog.showAndListen();
-                    result.cleanup();
                 }
 
             }
@@ -263,7 +265,11 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
 
         Intent intent;
 
-        if (action.toLowerCase().contains("flightsearch") && action.contains("_Done")){
+        if (action.toLowerCase().contains("flightsearch") && action.contains("_Done") &&
+                contextParamters.get("geo-city") != null &&
+                contextParamters.get("geo-city1") != null &&
+                contextParamters.get("date") != null){
+            continueListening = false;
             intent = new Intent(this,FlightActivity.class);
             intent.putExtra(FLIGHT_SRC, contextParamters.get("geo-city").getAsString());
             intent.putExtra(FLIGHT_DEST, contextParamters.get("geo-city1").getAsString());
@@ -275,6 +281,7 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
             startActivity(intent);
             result.cleanup();
         } else if (action.contains("searchitem_Done") && parameters.get("any") != null){
+            continueListening = false;
             intent = new Intent(this, SearchItemActivity.class);
             intent.putExtra(SEARCH_QUERY, parameters.get("any").getAsString());
             if (parameters.get("E_Commerce_websites") != null){
@@ -282,13 +289,28 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
             }
             startActivity(intent);
             result.cleanup();
-        } else if (action.equals("coupons_Done")){
-            if (parameters.get(E_COMMERCE) != null){
-                intent = new Intent(this, CouponsActivity.class);
-                intent.putExtra(COUPON_SITE,parameters.get(E_COMMERCE).getAsString());
-                startActivity(intent);
-                result.cleanup();
-            }
+        } else if (action.equals("coupons_Done") && parameters.get(E_COMMERCE) != null){
+            continueListening = false;
+            intent = new Intent(this, CouponsActivity.class);
+            intent.putExtra(COUPON_SITE,parameters.get(E_COMMERCE).getAsString());
+            startActivity(intent);
+            result.cleanup();
+        } else if (action.toLowerCase().equals("flightsearchoneliner_Done") &&
+                parameters.get("date") != null &&
+                parameters.get("geo-city") != null &&
+                parameters.get("geo-city1") != null &&
+                parameters.get("number-integer") != null){
+
+            continueListening = false;
+            intent = new Intent(this,FlightActivity.class);
+            intent.putExtra(FLIGHT_SRC, parameters.get("geo-city").getAsString());
+            intent.putExtra(FLIGHT_DEST, parameters.get("geo-city").getAsString());
+            intent.putExtra(FLIGHT_DATE, parameters.get("date").getAsString());
+            intent.putExtra(FLIGHT_COUNT, parameters.get("number-integer").getAsInt());
+
+            startActivity(intent);
+            result.cleanup();
+
         }
 
     }
@@ -302,4 +324,22 @@ public class MainActivity extends AppCompatActivity implements AIDialog.AIDialog
     public void onCancelled() {
 
     }
+
+    /*private class WatsonTask extends AsyncTask<String, Void, Void> {
+
+        @Override
+        protected Void doInBackground(String... params) {
+            TextToSpeech textToSpeech = initTextToSpeech();
+            streamPlayer = new StreamPlayer();
+            streamPlayer.playStream(textToSpeech.synthesize(params[0],Voice.EN_LISA).execute());
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if (continueListening){
+                aiDialog.showAndListen();
+            }
+        }
+    } */
 }
