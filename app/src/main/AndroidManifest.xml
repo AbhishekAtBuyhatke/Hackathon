@@ -46,6 +46,10 @@
             android:name=".FlightActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".CouponsActivity"></activity>
+
+        <activity android:name=".accessiblity.OverlayActivity"
+            android:theme="@style/MainTheme">
+        </activity>
     </application>
 
 </manifest>
