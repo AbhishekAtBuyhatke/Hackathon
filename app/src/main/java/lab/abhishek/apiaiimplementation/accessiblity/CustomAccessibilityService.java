@@ -175,7 +175,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
             intent.putExtra(APP_NAME, currentAppName);
             intent.putExtra("FLIGHT_DATA", productPageEvent.flightData);
-            intent.putExtra("APP_TYPE","FLIGHT");
+            intent.putExtra("adapter_flag","FLIGHT");
             startActivity(intent);
         } else {
             Log.d(TAG, "wont identify flight");
