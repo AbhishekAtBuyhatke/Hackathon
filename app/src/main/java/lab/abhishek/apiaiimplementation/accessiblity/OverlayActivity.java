@@ -137,6 +137,8 @@ public class OverlayActivity extends AppCompatActivity {
                 break;
 
             case "FLIGHT" :
+                pd.setMessage("Loading...");
+                pd.show();
                 setUpRecyclerView();
                 setupToolbar(flightData);
                 getFlightSession(flightData);
@@ -190,6 +192,7 @@ public class OverlayActivity extends AppCompatActivity {
                     if(journeyDetails == null){
                         callFlightResultAPIwithDelay();
                     } else if(journeyDetails.getStatus().equals(FLIGHT_UPDATE_COMPLETE_STATUS)) {
+                        pd.dismiss();
                         allFlightData = journeyDetails;
                         adapter.appendFlightData(allFlightData);
                         findViewById(R.id.flight_progress_bar).setVisibility(View.GONE);
@@ -204,7 +207,7 @@ public class OverlayActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<FlightJourney> call, Throwable t) {
-
+                pd.dismiss();
             }
         });
     }
