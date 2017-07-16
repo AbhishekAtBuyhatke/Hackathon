@@ -172,6 +172,7 @@ public class CustomAccessibilityService extends AccessibilityService implements 
     }
 
     private void enableFlightAssistant() {
+        maybeHideFloatingButton();
         if (productPageEvent != null && productPageEvent.flightData != null) {
             Intent intent = new Intent(this, OverlayActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);

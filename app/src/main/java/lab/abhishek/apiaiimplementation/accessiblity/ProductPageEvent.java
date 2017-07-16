@@ -1,5 +1,7 @@
 package lab.abhishek.apiaiimplementation.accessiblity;
 
+import lab.abhishek.apiaiimplementation.Models.Flight.FlightData;
+
 public class ProductPageEvent {
 
     public String product;

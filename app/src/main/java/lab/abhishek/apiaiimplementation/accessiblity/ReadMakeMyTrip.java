@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import lab.abhishek.apiaiimplementation.Models.Flight.FlightData;
+
 /**
  * Created by Bhargav on 07/06/17.
  */
